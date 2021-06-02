@@ -15,6 +15,8 @@ To handle multiple connections, need to allocate a new Thread per client socket.
 - Each thread requires stack space (wasted resources) (64KB - 1MB depending on the OS)
 - Context switching within threads becomes a bottle neck (mayber after 10k threads)
 
+![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/onesockperthread.jpeg)
+
 NIO (non-blocking I/O) <br>
 selector() - hooks into the event notification API of the OS. Allows 1 Thread to handle more than 1 connection
 

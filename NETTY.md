@@ -30,6 +30,7 @@ Main Building blocks
     - another mechanism for notification (similar to callback)
 - events
     - Active/Inactive connection, Data reads, User events, Error events
-    
+
+![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/onethreadmultsock.jpeg)
 
 under the covers netty is using an EventLoop

@@ -34,3 +34,10 @@ Main Building blocks
 ![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/onethreadmultsock.jpeg)
 
 under the covers netty is using an EventLoop
+
+Chapter2 
+------
+
+Main components of a Netty server:
+- At least 1 ChannelHandler
+- Bootstrap startup up code. Bind to a port, configure channel to notify your class on messages

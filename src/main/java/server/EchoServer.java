@@ -23,6 +23,7 @@ public class EchoServer {
       System.err.println("Usage: " + EchoServer.class.getSimpleName() + " <port>");
       return;
     }
+    System.out.println("Starting up server");
     new EchoServer(Integer.parseInt(args[0])).start();
   }
 

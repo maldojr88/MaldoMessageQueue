@@ -51,7 +51,12 @@ Main architecture is composed of the following abstractions:
 
 ### Channel
 Provides an API on top of native Java Socket class to simplify. A channel registers
-with an EventLoop for it's entire lifetime
+with an EventLoop for it's entire lifetime.
+Channel LifeCytle:
+- ChannelRegistered
+- ChannelActive
+- ChannelInactive
+- ChannelUnregistered
 
 ### EventLoop
 Core abstraction for handling events
@@ -71,9 +76,33 @@ On a practical basis, since there are many events you don't care about and might
 implement, you have the ChannelOutboundHandlerAdapter and ChannelInboundHandlerAdapter which you
 can extend and only override the methods you're interested in.
 
-In fact, SimpleChannelInboundHandler is the class you will typcially extend
+In fact, SimpleChannelInboundHandler is the class you will typically extend
+
+![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/channelrelationship.jpeg)
 
 ChannelPipeline is a container for a chain of ChannelHandlers. ChannelInitializer will
-create a custom ChannelPipeline when a channel is created.
+create a custom ChannelPipeline when a channel is created. 
+
+ChannelHandlers typically provide the following:
+1. Transforming data from one format to another (encoders/decoders)
+2. Providing notification of Exceptions
+3. Providing notification of a Channel becoming active/inactive
+4. Provide notification when a Channel is registered/deregistered from EventLoop
+5. Providing notification about user-defined events
+ChannelHandlerAdaptors are provide basic implementations to help you write your custom Channel Handlers
+
+ChannelHandlerContext - allow ChannelHandlers in a ChannelPipeline to communicate
 
 Encoders and Decoders are classes to convert binary to Java object and vice versa.
+
+
+ZeroCopy is a Linux feature that allows you to copy data from the filesystem
+to the network without copying to user space. This functionality is serviced
+by the epoll Linux system call
+
+ByteBuf is an API on top of ByteBuffer to allow for easier usage. You can use
+a version that is allocated on the heap or one that is allocated off the heap. PooledByteBufAllocator and
+UnpooledByteBufAllocator are the two main classes to allocate ByteBuf. The former 
+is based on jemalloc to help improve performance and minimize memory fragmentation.
+Unpooled and ByteBufUtil are utility classes to manipulate ByteBufs. hexdump is a populare
+function as it eases debugging of byte data.

@@ -12,5 +12,6 @@ Design Doc
 To Learn
 -----
 - Netty (network programming)
+    - See NETTY.md for notes
     - callbacks, futures
 - 

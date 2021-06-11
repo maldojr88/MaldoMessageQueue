@@ -1,6 +1,0 @@
-Concepts Learned
-======
-
-Netty
-------
-

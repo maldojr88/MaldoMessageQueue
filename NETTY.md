@@ -108,3 +108,11 @@ UnpooledByteBufAllocator are the two main classes to allocate ByteBuf. The forme
 is based on jemalloc to help improve performance and minimize memory fragmentation.
 Unpooled and ByteBufUtil are utility classes to manipulate ByteBufs. hexdump is a populare
 function as it eases debugging of byte data.
+
+Bootstrapping
+Connecting all the components together to form your networking application
+Server devotes a parent channel to accepting connections from clients and creating child channels for 
+conversing with them. Add multiple ChannelHandlers by implementing your own ChannelInitializer class
+and passing that into the bootstrap process
+
+Client will most likely require only a single, non-parent channel for all network interactions

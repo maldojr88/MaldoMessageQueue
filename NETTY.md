@@ -61,7 +61,9 @@ Channel LifeCytle:
 ### EventLoop
 Core abstraction for handling events
 ![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/eventloop.jpeg)
+
 EventLoop binds to a single Thread. Can be assigned to more than one Channel
+![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/eventloop2.jpeg)
 
 ### ChannelFuture
 Placeholder for the results of an operation

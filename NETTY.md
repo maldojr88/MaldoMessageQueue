@@ -93,9 +93,9 @@ ChannelHandlers typically provide the following:
 5. Providing notification about user-defined events
 ChannelHandlerAdaptors are provide basic implementations to help you write your custom Channel Handlers
 
-ChannelHandlerContext - allow ChannelHandlers in a ChannelPipeline to communicate
+IdleStateHandler - for idle connections
 
-Encoders and Decoders are classes to convert binary to Java object and vice versa.
+ChannelHandlerContext - allow ChannelHandlers in a ChannelPipeline to communicate
 
 
 ZeroCopy is a Linux feature that allows you to copy data from the filesystem
@@ -116,3 +116,32 @@ conversing with them. Add multiple ChannelHandlers by implementing your own Chan
 and passing that into the bootstrap process
 
 Client will most likely require only a single, non-parent channel for all network interactions
+
+
+#### Testing
+EmbeddedChannel use it to facilitate in testing ChannelHandlers
+
+
+#### Encoders and Decoders
+Encoders and Decoders are classes to convert binary to Java object and vice versa.
+ByteToMessageDecoder - main abstract class for decoders. ReplayingDecoder is also a class worth looking at
+
+ByteToMessageDecoder - same for encoders.
+
+CombinedChannelDuplexHandler - combines an encoder and a decoder into 1
+
+Serialization Options
+- JDK serialization
+- JBoss Marshalling (faster and more compact than JDK)
+- Protocol Buffers
+
+Another alternative for Java Serialization is Protocol Buffers
+
+#### TLS
+SSLContext and SSLEngine are the Java APIs for SSL. Netty leverages these API's to secure communication.
+SslHandler is the netty handler for performing this type of work. Netty also provides OpenSslEngine
+which is its own implementation of SSLEngine with "added performance". SSLChannelInitializer can be 
+used to add the SSLHandler to the ChannelPipeline
+
+Websocket protocol
+https://datatracker.ietf.org/doc/html/rfc6455

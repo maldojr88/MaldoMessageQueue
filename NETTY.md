@@ -23,9 +23,9 @@ selector() - hooks into the event notification API of the OS. Allows 1 Thread to
 Main Building blocks
 
 - channel
-    - open connection to ta file (socket, device, file etc.) that is capable of doing I/O
+    - open connection to a file (socket, device, file etc.) that is capable of doing I/O
 - callbacks
-    - a method ot be called later. Used to notify. ChannelHandler interface
+    - a method to be called later. Used to notify. ChannelHandler interface
 - future
     - another mechanism for notification (similar to callback)
 - events
@@ -60,9 +60,11 @@ Channel LifeCytle:
 
 ### EventLoop
 Core abstraction for handling events
+
 ![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/eventloop.jpeg)
 
 EventLoop binds to a single Thread. Can be assigned to more than one Channel
+
 ![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/eventloop2.jpeg)
 
 ### ChannelFuture
@@ -110,6 +112,7 @@ Unpooled and ByteBufUtil are utility classes to manipulate ByteBufs. hexdump is 
 function as it eases debugging of byte data.
 
 Bootstrapping
+
 Connecting all the components together to form your networking application
 Server devotes a parent channel to accepting connections from clients and creating child channels for 
 conversing with them. Add multiple ChannelHandlers by implementing your own ChannelInitializer class

@@ -10,21 +10,22 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.InetSocketAddress;
 
-public class EchoServer {
+public class MMQServer {
 
   private final int port;
 
-  public EchoServer(int port) {
+  public MMQServer(int port) {
     this.port = port;
   }
 
   public static void main(String[] args) throws Exception {
     if(args.length != 1) {
-      System.err.println("Usage: " + EchoServer.class.getSimpleName() + " <port>");
+      System.err.println("Usage: " + MMQServer.class.getSimpleName() + " <port>");
       return;
     }
-    System.out.println("Starting up server");
-    new EchoServer(Integer.parseInt(args[0])).start();
+    String port = args[0];
+    System.out.println("Starting up MMQ server on port " + port);
+    new MMQServer(Integer.parseInt(port)).start();
   }
 
   public void start() throws Exception {
@@ -37,7 +38,7 @@ public class EchoServer {
           .childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel socketChannel) throws Exception {
-              socketChannel.pipeline().addLast(new EchoServerHandler());
+              socketChannel.pipeline().addLast(new MMQServerHandler());
             }
           });
       ChannelFuture f = b.bind().sync();

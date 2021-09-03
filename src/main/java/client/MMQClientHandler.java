@@ -8,7 +8,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
 
 @ChannelHandler.Sharable
-public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf>{
+public class MMQClientHandler extends SimpleChannelInboundHandler<ByteBuf>{
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) {

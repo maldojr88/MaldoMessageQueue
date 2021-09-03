@@ -11,11 +11,11 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.net.InetSocketAddress;
 
-public class EchoClient {
+public class MMQClient {
   private final String host;
   private final int port;
 
-  public EchoClient(String host, int port) {
+  public MMQClient(String host, int port) {
     this.host = host;
     this.port = port;
   }
@@ -30,7 +30,7 @@ public class EchoClient {
           .handler(new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(SocketChannel ch) throws Exception {
-              ch.pipeline().addLast(new EchoClientHandler());
+              ch.pipeline().addLast(new MMQClientHandler());
             }
           });
       ChannelFuture f = b.connect().sync();
@@ -42,12 +42,13 @@ public class EchoClient {
 
   public static void main(String[] args) throws Exception {
     if(args.length != 2) {
-      System.err.println("Usage: " + EchoClient.class.getSimpleName() + " <host> <port>");
+      System.err.println("Usage: " + MMQClient.class.getSimpleName() + " <host> <port>");
       return;
     }
 
     final String host = args[0];
     final int port = Integer.parseInt(args[1]);
-    new EchoClient(host, port).start();
+    System.out.println("Connecting MMQ client to " + host + " and port " + port);
+    new MMQClient(host, port).start();
   }
 }

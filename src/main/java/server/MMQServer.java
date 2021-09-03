@@ -7,12 +7,15 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
 
 public class MMQServer {
 
   private final int port;
+  private static final Logger log = LogManager.getLogger(MMQServer.class);
 
   public MMQServer(int port) {
     this.port = port;
@@ -20,15 +23,25 @@ public class MMQServer {
 
   public static void main(String[] args) throws Exception {
     if(args.length != 1) {
-      System.err.println("Usage: " + MMQServer.class.getSimpleName() + " <port>");
+      log.error("Usage: " + MMQServer.class.getSimpleName() + " <port>");
       return;
     }
     String port = args[0];
-    System.out.println("Starting up MMQ server on port " + port);
-    new MMQServer(Integer.parseInt(port)).start();
+    log.info("Starting up MMQ server on port " + port);
+    MMQServer mmqServer = new MMQServer(Integer.parseInt(port));
+    mmqServer.loadState();
+    mmqServer.acceptConnections();
   }
 
-  public void start() throws Exception {
+  /*
+   * 1. load state
+   * 2. Print table
+   */
+  private void loadState() {
+
+  }
+
+  public void acceptConnections() throws Exception {
     EventLoopGroup group = new NioEventLoopGroup();
     try {
       ServerBootstrap b = new ServerBootstrap();

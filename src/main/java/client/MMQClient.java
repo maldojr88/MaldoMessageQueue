@@ -8,10 +8,14 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import server.MMQServer;
 
 import java.net.InetSocketAddress;
 
 public class MMQClient {
+  private static final Logger log = LogManager.getLogger(MMQClient.class);
   private final String host;
   private final int port;
 
@@ -42,13 +46,13 @@ public class MMQClient {
 
   public static void main(String[] args) throws Exception {
     if(args.length != 2) {
-      System.err.println("Usage: " + MMQClient.class.getSimpleName() + " <host> <port>");
+      log.error("Usage: " + MMQClient.class.getSimpleName() + " <host> <port>");
       return;
     }
 
     final String host = args[0];
     final int port = Integer.parseInt(args[1]);
-    System.out.println("Connecting MMQ client to " + host + " and port " + port);
+    log.info("Connecting MMQ client to " + host + " and port " + port);
     new MMQClient(host, port).start();
   }
 }

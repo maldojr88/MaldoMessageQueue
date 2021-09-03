@@ -10,12 +10,16 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.*;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MMQServer {
 
   private final int port;
   private static final Logger log = LogManager.getLogger(MMQServer.class);
+
 
   public MMQServer(int port) {
     this.port = port;
@@ -29,17 +33,11 @@ public class MMQServer {
     String port = args[0];
     log.info("Starting up MMQ server on port " + port);
     MMQServer mmqServer = new MMQServer(Integer.parseInt(port));
-    mmqServer.loadState();
+    MMQCatalog catalog = new MMQCatalog();
+    catalog.createQueue("DUMMY");
     mmqServer.acceptConnections();
   }
 
-  /*
-   * 1. load state
-   * 2. Print table
-   */
-  private void loadState() {
-
-  }
 
   public void acceptConnections() throws Exception {
     EventLoopGroup group = new NioEventLoopGroup();

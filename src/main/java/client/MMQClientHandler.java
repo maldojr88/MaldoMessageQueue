@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.CharsetUtil;
+import net.MessageType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import server.MMQServer;
@@ -16,7 +17,13 @@ public class MMQClientHandler extends SimpleChannelInboundHandler<ByteBuf>{
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) {
-    ctx.writeAndFlush(Unpooled.copiedBuffer("Connection established!", CharsetUtil.UTF_8));
+    log.info("Connection accepted by the server");
+
+    //ctx.writeAndFlush(Unpooled.copiedBuffer("Connection established!", CharsetUtil.UTF_8));
+    MessageType messageType = MessageType.CONNECT_TO_PUBLISH;
+    log.info("Sending messageType to the Server " + messageType);
+    ByteBuf buffer = Unpooled.copyInt(messageType.getType());
+    ctx.writeAndFlush(buffer);
   }
 
   @Override

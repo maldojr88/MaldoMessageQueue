@@ -4,30 +4,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MMQCatalog {
     private static final Logger log = LogManager.getLogger(MMQCatalog.class);
+    private static final String FILE_NAME = "mmqcatalog.dat";
     private Map<String, String> catalog;
+    private final Path catalogPath;
 
-    public MMQCatalog(){
+    public MMQCatalog(Path catalogDir) {
+        this.catalogPath = Paths.get(catalogDir.toAbsolutePath() + "/" + FILE_NAME);
         loadCatalog();
-    }
-
-    private void saveCatalog() {
-        try
-        {
-            log.info("Saving catalog");
-            FileOutputStream fos = new FileOutputStream("hashmap.ser");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(catalog);
-            oos.close();
-            fos.close();
-            log.info("Serialized HashMap data is saved in hashmap.ser");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void createQueue(String queueName) {
@@ -37,14 +28,24 @@ public class MMQCatalog {
         saveCatalog();
     }
 
-    /*
-     * 1. load state
-     * 2. Print table
-     */
+    private void saveCatalog() {
+        try {
+            log.info("Saving catalog");
+            OutputStream fos = Files.newOutputStream(catalogPath);;
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(catalog);
+            oos.close();
+            fos.close();
+            log.info("Saved catalog");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loadCatalog() {
         try
         {
-            FileInputStream fis = new FileInputStream("hashmap.ser");
+            InputStream fis = Files.newInputStream(catalogPath);
             ObjectInputStream ois = new ObjectInputStream(fis);
             catalog = (HashMap) ois.readObject();
             ois.close();

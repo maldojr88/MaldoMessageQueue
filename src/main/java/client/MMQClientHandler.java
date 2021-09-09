@@ -9,7 +9,8 @@ import io.netty.util.CharsetUtil;
 import net.MessageType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import server.MMQServer;
+
+import java.nio.charset.StandardCharsets;
 
 @ChannelHandler.Sharable
 public class MMQClientHandler extends SimpleChannelInboundHandler<ByteBuf>{
@@ -23,6 +24,7 @@ public class MMQClientHandler extends SimpleChannelInboundHandler<ByteBuf>{
     MessageType messageType = MessageType.CONNECT_TO_PUBLISH;
     log.info("Sending messageType to the Server " + messageType);
     ByteBuf buffer = Unpooled.copyInt(messageType.getType());
+    buffer.writeBytes("Queue1".getBytes(StandardCharsets.UTF_8));
     ctx.writeAndFlush(buffer);
   }
 

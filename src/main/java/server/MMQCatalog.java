@@ -22,6 +22,10 @@ public class MMQCatalog {
     }
 
     public void createQueue(String queueName) {
+        if(catalog.containsKey(queueName)){
+            log.info("Not creating Queue " + queueName + " as it already exists");
+            return;
+        }
         log.info("Creating queue " + queueName);
         catalog.put(queueName, "blah");
         log.info("Created " + queueName + " in memory");
@@ -43,8 +47,7 @@ public class MMQCatalog {
     }
 
     private void loadCatalog() {
-        try
-        {
+        try {
             InputStream fis = Files.newInputStream(catalogPath);
             ObjectInputStream ois = new ObjectInputStream(fis);
             catalog = (HashMap) ois.readObject();

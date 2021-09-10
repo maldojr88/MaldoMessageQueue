@@ -2,6 +2,7 @@ package client;
 
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -33,13 +34,22 @@ public class MMQClient {
           .handler(new ChannelInitializer<SocketChannel>() {
             @Override
             public void initChannel(SocketChannel ch) throws Exception {
-              ch.pipeline().addLast(new MMQClientHandler());
+              ch.pipeline().addLast(new MMQClientChannelHandler());
             }
           });
-      ChannelFuture f = b.connect().sync();
-      f.channel().closeFuture().sync();
+      //ChannelFuture f = b.connect().sync();
+      ChannelFuture f = b.connect();
+      Channel channel = f.channel();
+      //f.channel().closeFuture().sync();
+
+      //1st message
+      channel.writeAndFlush(MessageEncoder.connectToPublish("Q1")).sync();
+      Thread.sleep(3000);
+
+      //2nd message
+      channel.writeAndFlush(MessageEncoder.publish("MMG Tooo")).sync();
     } finally {
-      group.shutdownGracefully().sync();
+      //group.shutdownGracefully().sync();
     }
   }
 

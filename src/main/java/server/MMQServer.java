@@ -3,6 +3,7 @@ package server;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -35,7 +36,9 @@ public class MMQServer {
 
     public void acceptConnections() throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
-        MMQServerHandler mmqServerHandler = new MMQServerHandler(this);
+        MMQServerChannelHandler mmqServerChannelHandler = new MMQServerChannelHandler(this);
+        MessageDecoder decoder = new MessageDecoder();
+        decoder.setMMQServer(this);
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(group)
@@ -45,9 +48,11 @@ public class MMQServer {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
 
-                            socketChannel.pipeline().addLast(mmqServerHandler);
+                            socketChannel.pipeline().addLast(decoder,mmqServerChannelHandler);
                         }
-                    });
+                    })
+                    .option(ChannelOption.SO_BACKLOG, 128) //Dont understand
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture f = b.bind().sync();
             f.channel().closeFuture().sync();
         } finally {

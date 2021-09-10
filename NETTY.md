@@ -108,7 +108,7 @@ ByteBuf is an API on top of ByteBuffer to allow for easier usage. You can use
 a version that is allocated on the heap or one that is allocated off the heap. PooledByteBufAllocator and
 UnpooledByteBufAllocator are the two main classes to allocate ByteBuf. The former 
 is based on jemalloc to help improve performance and minimize memory fragmentation.
-Unpooled and ByteBufUtil are utility classes to manipulate ByteBufs. hexdump is a populare
+Unpooled and ByteBufUtil are utility classes to manipulate ByteBufs. hexdump is a popular
 function as it eases debugging of byte data.
 
 Bootstrapping
@@ -148,3 +148,8 @@ used to add the SSLHandler to the ChannelPipeline
 
 Websocket protocol
 https://datatracker.ietf.org/doc/html/rfc6455
+
+Links
+---
+https://netty.io/wiki/user-guide-for-4.x.html
+https://github.com/netty/netty/tree/4.1/example/src/main/java/io/netty/example

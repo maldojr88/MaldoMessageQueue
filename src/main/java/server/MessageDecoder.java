@@ -4,8 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import io.netty.util.CharsetUtil;
-import net.MessageAck;
-import net.MessageType;
+import net.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,27 +49,38 @@ public class MessageDecoder extends ByteToMessageDecoder {
                     }
                     ByteBuf strBuff = in.readBytes(strLen);
                     String queueName = strBuff.toString(CharsetUtil.UTF_8);
-                    mmqServer.registerPublisher((InetSocketAddress) ctx.channel().remoteAddress(), queueName);
-                    ctx.writeAndFlush(MessageAck.newAck());
+                    Message msg = new MessageConnectPublish(mmqServer,(InetSocketAddress) ctx.channel().remoteAddress(),queueName);
+                    out.add(msg);
                 }
                 case PUBLISH -> {
-                    InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
-                    if (!mmqServer.isRegisteredToPublish(remoteAddress))
-                        throw new RuntimeException("Remote address not registered to publish " + remoteAddress);
+                    if(in.readableBytes() < 4) {
+                        in.resetReaderIndex();
+                        return;
+                    }
+                    int queueStrLen = in.readInt();
+                    if(in.readableBytes() < queueStrLen){
+                        in.resetReaderIndex();
+                        return;
+                    }
+                    ByteBuf queueNameBuff = in.readBytes(queueStrLen);
+                    String queueName = queueNameBuff.toString(CharsetUtil.UTF_8);
 
                     if(in.readableBytes() < 4) {
                         in.resetReaderIndex();
                         return;
                     }
-                    int strLen = in.readInt();
-                    if(in.readableBytes() < strLen){
+                    int msgStrLen = in.readInt();
+                    if(in.readableBytes() < msgStrLen){
                         in.resetReaderIndex();
                         return;
                     }
-                    ByteBuf strBuff = in.readBytes(strLen);
-                    String msgToPublish = strBuff.toString(CharsetUtil.UTF_8);
+                    ByteBuf msgBuff = in.readBytes(msgStrLen);
+
+                    String msgToPublish = msgBuff.toString(CharsetUtil.UTF_8);
                     log.info("Message to Publish: " + msgToPublish);
-                    ctx.writeAndFlush(MessageAck.newAck());
+                    Message msg = new MessagePublish(mmqServer, queueName, msgToPublish, (InetSocketAddress) ctx.channel().remoteAddress());
+                    //ctx.writeAndFlush(MessageAck.newAck());
+                    out.add(msg);
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + messageType);
             }

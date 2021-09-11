@@ -76,4 +76,8 @@ public class MMQServer {
     public boolean isRegisteredToPublish(InetSocketAddress remoteAddress){
         return publishers.containsKey(remoteAddress);
     }
+
+    public void publish(String queueName, String msg){
+        log.info("Publishing msg " + msg + " to [" + queueName + "]");
+    }
 }

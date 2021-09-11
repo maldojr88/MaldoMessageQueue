@@ -3,8 +3,12 @@ package server;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import net.Message;
+import net.MessageAck;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.net.InetSocketAddress;
 
 @ChannelHandler.Sharable
 public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
@@ -17,8 +21,7 @@ public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelActive(ChannelHandlerContext ctx) {
-    log.info("Accepting client connection");
-    log.info(ctx.channel());
+    log.info("Accepting client connection " + ctx.channel());
   }
 
   @Override
@@ -27,8 +30,10 @@ public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg) {
-
+  public void channelRead(ChannelHandlerContext ctx, Object obj) {
+    Message msg = (Message) obj;
+    msg.execute();
+    ctx.writeAndFlush(MessageAck.newAck());
   }
 
   @Override

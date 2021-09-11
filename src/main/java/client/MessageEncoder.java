@@ -21,13 +21,16 @@ public class MessageEncoder {
         return buffer;
     }
 
-    public static ByteBuf publish(String msg){
+    public static ByteBuf publish(String queueName, String msg){
         ByteBuf byteBuf = Unpooled.copyInt(MessageType.PUBLISH.getType());
         MessageType messageType = MessageType.PUBLISH;
         log.info("Sending messageType to the Server " + messageType);
-        byte[] bytes = msg.getBytes(StandardCharsets.UTF_8);
-        byteBuf.writeInt(bytes.length);
-        byteBuf.writeBytes(bytes);
+        byte[] queueNameBytes = queueName.getBytes(StandardCharsets.UTF_8);
+        byteBuf.writeInt(queueName.length());
+        byteBuf.writeBytes(queueNameBytes);
+        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+        byteBuf.writeInt(msgBytes.length);
+        byteBuf.writeBytes(msgBytes);
         return byteBuf;
     }
 }

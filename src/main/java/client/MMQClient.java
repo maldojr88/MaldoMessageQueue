@@ -46,7 +46,7 @@ public class MMQClient {
       Thread.sleep(3000);
 
       //2nd message
-      channel.writeAndFlush(MessageEncoder.publish("MMG Tooo")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "MMG Tooo")).sync();
       //Thread.sleep(100000);
     } finally {
       //group.shutdownGracefully().sync();

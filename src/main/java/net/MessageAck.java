@@ -5,9 +5,11 @@ import io.netty.buffer.Unpooled;
 
 public class MessageAck {
     public static final int valueAck = 8888;
-    public static final ByteBuf ACK = Unpooled.copyInt(valueAck);
 
     public static boolean isAck(ByteBuf buf){
         return buf.readInt() == valueAck;
+    }
+    public static ByteBuf newAck(){
+        return Unpooled.copyInt(valueAck);
     }
 }

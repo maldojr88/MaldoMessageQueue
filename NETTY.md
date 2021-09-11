@@ -13,12 +13,13 @@ To handle multiple connections, need to allocate a new Thread per client socket.
 
 - Most threads would probably be blocking most of the time (wasted resources)
 - Each thread requires stack space (wasted resources) (64KB - 1MB depending on the OS)
-- Context switching within threads becomes a bottle neck (mayber after 10k threads)
+- Context switching within threads becomes a bottleneck (mayber after 10k threads)
 
 ![alt text](https://github.com/maldojr88/MaldoMessageQueue/blob/main/notes/onesockperthread.jpeg)
 
 NIO (non-blocking I/O) <br>
-selector() - hooks into the event notification API of the OS. Allows 1 Thread to handle more than 1 connection
+selector() - hooks into the event notification API of the OS. Allows 1 Thread to handle more than 1 connection.
+Selector is the linchpin of Java's non-blocking I/O
 
 Main Building blocks
 
@@ -45,14 +46,18 @@ Main components of a Netty server:
 Architecture
 ------
 Main architecture is composed of the following abstractions:
-- Channel - Socket
+- Channel - Socket. Basic I/O operations:
+  - bind()
+  - connect()
+  - read()
+  - write()
 - EventLoop - Control flow, multithreading, concurrency
 - ChannelFuture - Asynchronous notifications
 
 ### Channel
 Provides an API on top of native Java Socket class to simplify. A channel registers
-with an EventLoop for it's entire lifetime.
-Channel LifeCytle:
+with an EventLoop for its entire lifetime.
+Channel LifeCycle:
 - ChannelRegistered
 - ChannelActive
 - ChannelInactive
@@ -153,3 +158,14 @@ Links
 ---
 https://netty.io/wiki/user-guide-for-4.x.html
 https://github.com/netty/netty/tree/4.1/example/src/main/java/io/netty/example
+https://livebook.manning.com/book/netty-in-action/chapter-2/39
+
+Framework Notes
+---
+1. ServerBootstrap - configures everything. Bind method starts everything
+   1. Channel is created
+   2. Channel options are set
+   3. Add Channel Initializer to the pipeline
+2. <>
+   1.HandlerContext invokes channelActive on ChannelHandler 
+NioEventLoop#run - runs infinite loop to perform all the work

@@ -12,6 +12,12 @@ import org.apache.logging.log4j.Logger;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+/**
+ * TODO
+ *  1. Clean up Encoding/Decoding
+ *      - Look at Protocol Buffers for Serialization (or Apache Thrift)
+ */
+
 public class MessageDecoder extends ByteToMessageDecoder {
     private static final Logger log = LogManager.getLogger(MessageDecoder.class);
     private MMQServer mmqServer;
@@ -45,7 +51,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
                     ByteBuf strBuff = in.readBytes(strLen);
                     String queueName = strBuff.toString(CharsetUtil.UTF_8);
                     mmqServer.registerPublisher((InetSocketAddress) ctx.channel().remoteAddress(), queueName);
-                    ctx.writeAndFlush(MessageAck.ACK);
+                    ctx.writeAndFlush(MessageAck.newAck());
                 }
                 case PUBLISH -> {
                     InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
@@ -64,8 +70,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
                     ByteBuf strBuff = in.readBytes(strLen);
                     String msgToPublish = strBuff.toString(CharsetUtil.UTF_8);
                     log.info("Message to Publish: " + msgToPublish);
-                    ctx.writeAndFlush(MessageAck.ACK);
-
+                    ctx.writeAndFlush(MessageAck.newAck());
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + messageType);
             }

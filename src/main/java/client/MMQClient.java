@@ -37,10 +37,9 @@ public class MMQClient {
               ch.pipeline().addLast(new MMQClientChannelHandler());
             }
           });
-      //ChannelFuture f = b.connect().sync();
-      ChannelFuture f = b.connect();
+      ChannelFuture f = b.connect().sync();//connect to the remote peer and wait until the connection completes
       Channel channel = f.channel();
-      //f.channel().closeFuture().sync();
+      //f.channel().closeFuture().sync();//block until the channel closes
 
       //1st message
       channel.writeAndFlush(MessageEncoder.connectToPublish("Q1")).sync();
@@ -48,6 +47,7 @@ public class MMQClient {
 
       //2nd message
       channel.writeAndFlush(MessageEncoder.publish("MMG Tooo")).sync();
+      //Thread.sleep(100000);
     } finally {
       //group.shutdownGracefully().sync();
     }

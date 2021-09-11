@@ -14,6 +14,11 @@ import org.apache.logging.log4j.Logger;
 import java.net.InetSocketAddress;
 import java.util.*;
 
+/**
+ * Netty servers contain two EventLoopGroups. The first represents the server's own listening
+ * socket, bound to a local port. The second will contain all the Channels that have been created
+ * to handle incoming connections (one for each connection the server has accepted)
+ */
 public class MMQServer {
     private static final Logger log = LogManager.getLogger(MMQServer.class);
     private final MMQConfig config;
@@ -53,8 +58,8 @@ public class MMQServer {
                     })
                     .option(ChannelOption.SO_BACKLOG, 128) //Dont understand
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
-            ChannelFuture f = b.bind().sync();
-            f.channel().closeFuture().sync();
+            ChannelFuture f = b.bind().sync();//sync waits for the bind to complete
+            f.channel().closeFuture().sync();//gets CloseFuture of the channel and blocks current thread until it completes
         } finally {
             group.shutdownGracefully().sync();
         }

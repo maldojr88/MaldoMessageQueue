@@ -1,25 +1,10 @@
 package server;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
-import io.netty.util.CharsetUtil;
-import io.netty.util.ReferenceCountUtil;
-import net.MessageAck;
-import net.MessageType;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.net.InetSocketAddress;
-
-/**
- * TODO
- *  1. Clean up Encoding/Decoding
- *      - Separate different operations on the channel into different channelHandlers.
- *      - Look at ByteToMessageDecoder
- *      - Look at Protocol Buffers for Serialization (or Apache Thrift)
- *
- */
 
 @ChannelHandler.Sharable
 public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
@@ -33,10 +18,9 @@ public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void channelActive(ChannelHandlerContext ctx) {
     log.info("Accepting client connection");
+    log.info(ctx.channel());
   }
 
-  //@Override
-  //public void channelInactive()
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
     log.info("Closing channel connection");

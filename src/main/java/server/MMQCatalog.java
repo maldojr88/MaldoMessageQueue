@@ -2,8 +2,11 @@ package server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import queue.Queue;
+import queue.QueueFactory;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,7 +16,8 @@ import java.util.Map;
 public class MMQCatalog {
     private static final Logger log = LogManager.getLogger(MMQCatalog.class);
     private static final String FILE_NAME = "mmqcatalog.dat";
-    private Map<String, String> catalog;
+
+    private Map<String, Queue> catalog;
     private final Path catalogPath;
 
     public MMQCatalog(Path catalogDir) {
@@ -27,9 +31,24 @@ public class MMQCatalog {
             return;
         }
         log.info("Creating queue " + queueName);
-        catalog.put(queueName, "blah");
+        Queue queue = QueueFactory.newQueue(queueName);
+
+        catalog.put(queueName, queue);
         log.info("Created " + queueName + " in memory");
         saveCatalog();
+    }
+
+    public Queue getQueue(String queueName){
+        validateQueueExists(queueName);
+        return catalog.get(queueName);
+    }
+
+    private void validateQueueExists(String queueName) {
+        if(!catalog.containsKey(queueName)){
+            String errorMsg = queueName + " does not exist";
+            log.error(errorMsg);
+            throw new RuntimeException(errorMsg);
+        }
     }
 
     private void saveCatalog() {

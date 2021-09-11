@@ -49,7 +49,8 @@ public class MessageDecoder extends ByteToMessageDecoder {
                     }
                     ByteBuf strBuff = in.readBytes(strLen);
                     String queueName = strBuff.toString(CharsetUtil.UTF_8);
-                    Message msg = new MessageConnectPublish(mmqServer,(InetSocketAddress) ctx.channel().remoteAddress(),queueName);
+                    Message msg = new MessageConnectPublish(mmqServer,(InetSocketAddress) ctx.channel().remoteAddress(),
+                            queueName);
                     out.add(msg);
                 }
                 case PUBLISH -> {
@@ -75,11 +76,10 @@ public class MessageDecoder extends ByteToMessageDecoder {
                         return;
                     }
                     ByteBuf msgBuff = in.readBytes(msgStrLen);
-
                     String msgToPublish = msgBuff.toString(CharsetUtil.UTF_8);
                     log.info("Message to Publish: " + msgToPublish);
-                    Message msg = new MessagePublish(mmqServer, queueName, msgToPublish, (InetSocketAddress) ctx.channel().remoteAddress());
-                    //ctx.writeAndFlush(MessageAck.newAck());
+                    Message msg = new MessagePublish(mmqServer, queueName, msgToPublish,
+                            (InetSocketAddress) ctx.channel().remoteAddress());
                     out.add(msg);
                 }
                 default -> throw new IllegalStateException("Unexpected value: " + messageType);

@@ -19,9 +19,6 @@ public class MessagePublish extends Message{
 
     @Override
     public void execute() {
-        if (!server.isRegisteredToPublish(remoteAddress))
-            throw new RuntimeException("Remote address not registered to publish " + remoteAddress);
-
-        server.publish(queueName, msg);
+        server.publish(remoteAddress, queueName, msg);
     }
 }

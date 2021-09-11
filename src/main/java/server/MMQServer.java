@@ -10,9 +10,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import queue.Queue;
 
 import java.net.InetSocketAddress;
-import java.util.*;
 
 /**
  * Netty servers contain two EventLoopGroups. The first represents the server's own listening
@@ -23,16 +23,11 @@ public class MMQServer {
     private static final Logger log = LogManager.getLogger(MMQServer.class);
     private final MMQConfig config;
     private final MMQCatalog catalog;
-    private final Map<InetSocketAddress, List<String>> publishers;
-    private final Map<InetSocketAddress, List<String>> consumers;
-
 
     public MMQServer(MMQConfig config) {
         log.info("Loading MMQServer with the following config:\n" + config);
         this.config = config;
         this.catalog = new MMQCatalog(config.catalogDir());
-        this.publishers = new HashMap<>();
-        this.consumers = new HashMap<>();
     }
 
     public void createQueue(String queueName){
@@ -66,18 +61,13 @@ public class MMQServer {
     }
 
     public void registerPublisher(InetSocketAddress remoteAddress, String queueName) {
-        log.info("Adding " + remoteAddress + " to publishers for " + queueName);
-        List<String> lst = publishers.getOrDefault(remoteAddress, new ArrayList<>());
-        lst.add(queueName);
-        publishers.put(remoteAddress, lst);
-        log.info("Publishers: " + publishers);
+        Queue queue = catalog.getQueue(queueName);
+        queue.addPublisher(remoteAddress);
     }
 
-    public boolean isRegisteredToPublish(InetSocketAddress remoteAddress){
-        return publishers.containsKey(remoteAddress);
-    }
-
-    public void publish(String queueName, String msg){
-        log.info("Publishing msg " + msg + " to [" + queueName + "]");
+    public void publish(InetSocketAddress address, String queueName, String msg){
+        //catalog;
+        Queue queue = catalog.getQueue(queueName);
+        queue.publish(address, msg);
     }
 }

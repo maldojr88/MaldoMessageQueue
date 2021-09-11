@@ -8,8 +8,6 @@ import net.MessageAck;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.net.InetSocketAddress;
-
 @ChannelHandler.Sharable
 public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
   private static final Logger log = LogManager.getLogger(MMQServerChannelHandler.class);
@@ -50,7 +48,6 @@ public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     log.error(cause);
-    //cause.printStackTrace();
     ctx.close();
   }
 }

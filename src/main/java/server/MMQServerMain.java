@@ -16,13 +16,9 @@ public class MMQServerMain {
     log.info("Initializing MMQServer");
     MMQConfig config = loadProperties();
     MMQServer mmqServer = new MMQServer(config);
-    bootstrapQueues(mmqServer);
-    mmqServer.acceptConnections();
+    mmqServer.initialize();
   }
 
-  private static void bootstrapQueues(MMQServer mmqServer) {
-    mmqServer.createQueue("Q1");
-  }
 
   private static MMQConfig loadProperties() throws Exception {
     Properties prop = new Properties();
@@ -31,7 +27,11 @@ public class MMQServerMain {
     } catch (IOException e) {
       throw new Exception("Failed to load MMQ Server properties");
     }
-    return new MMQConfig(Path.of(prop.getProperty("catalog.dir")),
+    Path rootDir = Path.of(prop.getProperty("root.dir"));
+    Path serverDir = rootDir.resolve("mmq");
+    Path catalog = serverDir.resolve("catalog");
+    Path queues = catalog.resolve("queues");
+    return new MMQConfig(serverDir, catalog, queues,
             Integer.parseInt(prop.getProperty("port")));
   }
 }

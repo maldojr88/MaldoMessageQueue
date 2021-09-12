@@ -6,10 +6,8 @@ import queue.Queue;
 import queue.QueueFactory;
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,20 +16,23 @@ public class MMQCatalog {
     private static final String FILE_NAME = "mmqcatalog.dat";
 
     private Map<String, Queue> catalog;
-    private final Path catalogPath;
+    private final Path catalogDir;
+    private final Path queuesDir;
 
-    public MMQCatalog(Path catalogDir) {
-        this.catalogPath = Paths.get(catalogDir.toAbsolutePath() + "/" + FILE_NAME);
+    public MMQCatalog(Path catalogDir, Path queuesPath) {
+        this.catalogDir = catalogDir.resolve(FILE_NAME);
+        this.queuesDir = queuesPath;
+        //this.queuesDirStr = queuesDir.toString();
         loadCatalog();
     }
 
-    public void createQueue(String queueName) {
+    public void createQueue(String queueName) throws IOException {
         if(catalog.containsKey(queueName)){
             log.info("Not creating Queue " + queueName + " as it already exists");
             return;
         }
         log.info("Creating queue " + queueName);
-        Queue queue = QueueFactory.newQueue(queueName);
+        Queue queue = QueueFactory.newQueue(queuesDir, queueName);
 
         catalog.put(queueName, queue);
         log.info("Created " + queueName + " in memory");
@@ -53,13 +54,13 @@ public class MMQCatalog {
 
     private void saveCatalog() {
         try {
-            log.info("Saving catalog");
-            OutputStream fos = Files.newOutputStream(catalogPath);;
+            log.info("Saving catalogDir");
+            OutputStream fos = Files.newOutputStream(catalogDir);;
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(catalog);
             oos.close();
             fos.close();
-            log.info("Saved catalog");
+            log.info("Saved catalogDir");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,15 +68,15 @@ public class MMQCatalog {
 
     private void loadCatalog() {
         try {
-            InputStream fis = Files.newInputStream(catalogPath);
+            InputStream fis = Files.newInputStream(catalogDir);
             ObjectInputStream ois = new ObjectInputStream(fis);
             catalog = (HashMap) ois.readObject();
             ois.close();
             fis.close();
-            log.info("Successfully loaded catalog " + catalog.toString());
+            log.info("Successfully loaded catalogDir " + catalog.toString());
         }catch (IOException | ClassNotFoundException e) {
-            log.error("Failed to open catalog", e);
-            log.info("Creating empty catalog");
+            log.error("Failed to open catalogDir", e);
+            log.info("Creating empty catalogDir");
             catalog = new HashMap<>();
         }
     }

@@ -12,7 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import queue.Queue;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
 
 /**
  * Netty servers contain two EventLoopGroups. The first represents the server's own listening
@@ -27,11 +29,39 @@ public class MMQServer {
     public MMQServer(MMQConfig config) {
         log.info("Loading MMQServer with the following config:\n" + config);
         this.config = config;
-        this.catalog = new MMQCatalog(config.catalogDir());
+        this.catalog = new MMQCatalog(config.catalogDir(), config.queuesDir());
     }
 
     public void createQueue(String queueName){
-        catalog.createQueue(queueName);
+        try {
+            catalog.createQueue(queueName);
+        } catch (IOException e) {
+            log.error("Failed to create queue", e);
+        }
+    }
+
+    public void registerPublisher(InetSocketAddress remoteAddress, String queueName) {
+        Queue queue = catalog.getQueue(queueName);
+        queue.addPublisher(remoteAddress);
+    }
+
+    public void publish(InetSocketAddress address, String queueName, String msg){
+        Queue queue = catalog.getQueue(queueName);
+        queue.publish(address, msg);
+    }
+
+    public void initialize() throws Exception {
+        createWorkspace();
+        bootstrapQueues();
+        acceptConnections();
+    }
+
+    private void createWorkspace() throws IOException {
+        log.info("Creating workspace dirs");
+        Files.createDirectories(config.serverDir());
+        Files.createDirectories(config.catalogDir());
+        Files.createDirectories(config.queuesDir());
+        log.info("Creating workspace dirs - Complete");
     }
 
     public void acceptConnections() throws Exception {
@@ -60,14 +90,8 @@ public class MMQServer {
         }
     }
 
-    public void registerPublisher(InetSocketAddress remoteAddress, String queueName) {
-        Queue queue = catalog.getQueue(queueName);
-        queue.addPublisher(remoteAddress);
-    }
-
-    public void publish(InetSocketAddress address, String queueName, String msg){
-        //catalog;
-        Queue queue = catalog.getQueue(queueName);
-        queue.publish(address, msg);
+    private void bootstrapQueues() {
+        createQueue("Q1");
+        createQueue("Q2");
     }
 }

@@ -1,12 +1,13 @@
-package client;
+package net;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.MessageType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
+import java.util.zip.CRC32;
+import java.util.zip.Checksum;
 
 public class MessageEncoder {
     private static final Logger log = LogManager.getLogger(MessageEncoder.class);
@@ -18,19 +19,30 @@ public class MessageEncoder {
         byte[] bytes = queueName.getBytes(StandardCharsets.UTF_8);
         buffer.writeInt(bytes.length);
         buffer.writeBytes(bytes);
+        //addChecksum(buffer);
         return buffer;
     }
 
     public static ByteBuf publish(String queueName, String msg){
-        ByteBuf byteBuf = Unpooled.copyInt(MessageType.PUBLISH.getType());
+        ByteBuf buffer = Unpooled.copyInt(MessageType.PUBLISH.getType());
         MessageType messageType = MessageType.PUBLISH;
         log.info("Sending messageType to the Server " + messageType);
         byte[] queueNameBytes = queueName.getBytes(StandardCharsets.UTF_8);
-        byteBuf.writeInt(queueName.length());
-        byteBuf.writeBytes(queueNameBytes);
+        buffer.writeInt(queueName.length());
+        buffer.writeBytes(queueNameBytes);
         byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
-        byteBuf.writeInt(msgBytes.length);
-        byteBuf.writeBytes(msgBytes);
-        return byteBuf;
+        buffer.writeInt(msgBytes.length);
+        buffer.writeBytes(msgBytes);
+        //addChecksum(buffer);
+        return buffer;
+    }
+
+    private static void addChecksum(ByteBuf buf) {
+        Checksum crc32 = new CRC32();
+        byte[] bytes = new byte[buf.readableBytes()];
+        int readerIndex = buf.readerIndex();
+        buf.getBytes(readerIndex, bytes);
+        crc32.update(bytes);
+        buf.writeLong(crc32.getValue());
     }
 }

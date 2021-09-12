@@ -3,38 +3,42 @@ package queue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serial;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Queue implements Serializable {
     private static final Logger log = LogManager.getLogger(Queue.class);
 
-    private String name;
+    private final String name;
     private Set<InetSocketAddress> publishers;
     private Set<InetSocketAddress> consumers;
-    private transient Path path;
-    private String pathStr;
+    private final QueueStore queueStore;
+    private List<QueueEntry> entries;
 
-    public Queue(Path queuesDir, String queueName) throws IOException {
+    public Queue(String queueName, QueueStore queueStore) {
         this.name = queueName;
-        this.path = queuesDir.resolve(queueName);
-        this.pathStr = path.toString();
-        Files.createDirectory(path);
-        publishers = new HashSet<>();
-        consumers = new HashSet<>();
+        this.queueStore = queueStore;
+        this.publishers = new HashSet<>();
+        this.consumers = new HashSet<>();
+        this.entries = new ArrayList<>();
     }
 
     public void publish(InetSocketAddress address, String msg){
         validatePublish(address);
-        log.info("Publishing " + msg + " to [" + name + "]");
+        log.info("Publishing " + msg + " to this queue [" + name + "]");
+        long id = Instant.now().toEpochMilli();
+        byte[] bytes = msg.getBytes(StandardCharsets.UTF_8);
+        QueueEntry entry = new QueueEntry(id, bytes);
+        byte[] pack = entry.pack();
+        log.info(pack);
+        entries.add(entry);//change to write
     }
 
     private void validatePublish(InetSocketAddress address) {
@@ -54,9 +58,9 @@ public class Queue implements Serializable {
         consumers.add(address);
     }
 
-    @Serial
+    /*@Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         this.path = Paths.get(this.pathStr);
-    }
+    }*/
 }

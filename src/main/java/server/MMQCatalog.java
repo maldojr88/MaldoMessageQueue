@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import queue.Queue;
 import queue.QueueFactory;
+import queue.QueueStore;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -22,7 +23,6 @@ public class MMQCatalog {
     public MMQCatalog(Path catalogDir, Path queuesPath) {
         this.catalogDir = catalogDir.resolve(FILE_NAME);
         this.queuesDir = queuesPath;
-        //this.queuesDirStr = queuesDir.toString();
         loadCatalog();
     }
 
@@ -36,7 +36,7 @@ public class MMQCatalog {
 
         catalog.put(queueName, queue);
         log.info("Created " + queueName + " in memory");
-        saveCatalog();
+        //saveCatalog();
     }
 
     public Queue getQueue(String queueName){

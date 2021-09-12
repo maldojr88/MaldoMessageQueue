@@ -9,6 +9,8 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import net.Message;
+import net.MessageEncoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,7 +48,7 @@ public class MMQClient {
       Thread.sleep(3000);
 
       //2nd message
-      channel.writeAndFlush(MessageEncoder.publish("Q1", "MMG Tooo")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "Hello World!")).sync();
       //Thread.sleep(100000);
     } finally {
       //group.shutdownGracefully().sync();

@@ -2,6 +2,7 @@ package net;
 
 import server.MMQServer;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class MessagePublish extends Message{
@@ -18,7 +19,7 @@ public class MessagePublish extends Message{
     }
 
     @Override
-    public void execute() {
+    public void execute() throws IOException {
         server.publish(remoteAddress, queueName, msg);
     }
 }

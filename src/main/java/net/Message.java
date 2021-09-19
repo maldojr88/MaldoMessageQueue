@@ -6,11 +6,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import server.MMQServer;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
 public abstract class Message {
     protected MMQServer server;
-    public abstract void execute();
+    public abstract void execute() throws IOException;
 }

@@ -3,6 +3,7 @@ package queue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -30,15 +31,15 @@ public class Queue implements Serializable {
         this.entries = new ArrayList<>();
     }
 
-    public void publish(InetSocketAddress address, String msg){
+    public void publish(InetSocketAddress address, String msg) throws IOException {
         validatePublish(address);
         log.info("Publishing " + msg + " to this queue [" + name + "]");
         long id = Instant.now().toEpochMilli();
-        byte[] bytes = msg.getBytes(StandardCharsets.UTF_8);
-        QueueEntry entry = new QueueEntry(id, bytes);
-        byte[] pack = entry.pack();
-        log.info(pack);
-        entries.add(entry);//change to write
+        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+        QueueEntry entry = new QueueEntry(id, msgBytes);
+        byte[] packedEntry = entry.pack();
+        log.info(packedEntry);
+        queueStore.append(packedEntry);
     }
 
     private void validatePublish(InetSocketAddress address) {

@@ -8,6 +8,8 @@ import net.MessageAck;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+
 @ChannelHandler.Sharable
 public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
   private static final Logger log = LogManager.getLogger(MMQServerChannelHandler.class);
@@ -28,7 +30,7 @@ public class MMQServerChannelHandler extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object obj) {
+  public void channelRead(ChannelHandlerContext ctx, Object obj) throws IOException {
     Message msg = (Message) obj;
     msg.execute();
     ctx.writeAndFlush(MessageAck.newAck());

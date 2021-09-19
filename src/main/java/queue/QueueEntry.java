@@ -10,21 +10,22 @@ import java.util.zip.CRC32;
 /**
  * TODO
  *  1. Add metadata?
+ *  2. Optimize Buf and readable bytes
  */
 public class QueueEntry {
     private static final Logger log = LogManager.getLogger(QueueEntry.class);
-    private long id;
+    private long instant;
     private final byte[] bytes;
     private long checksum;
 
-    public QueueEntry(long id, byte[] bytes){
-        this.id = id;
+    public QueueEntry(long instant, byte[] bytes){
+        this.instant = instant;
         this.bytes = bytes;
         setChecksum();
     }
 
     public byte[] pack(){
-        ByteBuf buf = Unpooled.copyLong(id);
+        ByteBuf buf = Unpooled.copyLong(instant);
         buf.writeBytes(bytes);
         buf.writeLong(checksum);
         byte[] ret = new byte[buf.readableBytes()];

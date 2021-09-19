@@ -46,7 +46,7 @@ public class MMQServer {
         queue.addPublisher(remoteAddress);
     }
 
-    public void publish(InetSocketAddress address, String queueName, String msg){
+    public void publish(InetSocketAddress address, String queueName, String msg) throws IOException {
         Queue queue = catalog.getQueue(queueName);
         queue.publish(address, msg);
     }

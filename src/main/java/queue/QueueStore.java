@@ -3,6 +3,7 @@ package queue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import queue.index.IndexTreeNode;
+import queue.index.QueueStoreIndex;
 
 import java.io.IOException;
 import java.nio.file.Files;

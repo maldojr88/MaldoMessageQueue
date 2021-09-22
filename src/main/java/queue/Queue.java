@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,9 +36,9 @@ public class Queue implements Serializable {
         long id = Instant.now().toEpochMilli();
         byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
         QueueEntry entry = new QueueEntry(id, msgBytes);
-        byte[] packedEntry = entry.pack();
-        log.info(packedEntry);
-        queueStore.append(packedEntry);
+        //byte[] packedEntry = entry.pack();
+        //log.info(packedEntry);
+        queueStore.append(entry);
     }
 
     private void validatePublish(InetSocketAddress address) {

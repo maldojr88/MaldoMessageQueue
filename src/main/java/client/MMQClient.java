@@ -49,6 +49,9 @@ public class MMQClient {
 
       //2nd message
       channel.writeAndFlush(MessageEncoder.publish("Q1", "Hello World!")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "Maldangel")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "El Mejoll")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "Lo ma duro")).sync();
       //Thread.sleep(100000);
     } finally {
       //group.shutdownGracefully().sync();

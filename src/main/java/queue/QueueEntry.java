@@ -24,6 +24,14 @@ public class QueueEntry {
         setChecksum();
     }
 
+    public long getInstant(){
+        return instant;
+    }
+
+    public int getByteSize(){
+        return Long.BYTES + bytes.length + Long.BYTES;
+    }
+
     public byte[] pack(){
         ByteBuf buf = Unpooled.copyLong(instant);
         buf.writeBytes(bytes);

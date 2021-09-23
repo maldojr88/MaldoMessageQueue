@@ -13,13 +13,13 @@ public class IndexTreeNode implements Comparable{
         this.length = length;
     }
 
-    public static int getNodeLength(){
+    public static int getNodeNumBytes(){
         return Long.BYTES + Long.BYTES + Integer.BYTES;
     }
 
-    public static IndexTreeNode from(byte[] bytes){
-        ByteBuffer buf = ByteBuffer.allocate(getNodeLength());
-        buf.put(bytes);
+    public static IndexTreeNode from(byte[] bytes, int startIdx){
+        ByteBuffer buf = ByteBuffer.allocate(getNodeNumBytes());
+        buf.put(bytes, startIdx, getNodeNumBytes());
         buf.flip();
         long id = buf.getLong();
         long offset = buf.getLong();
@@ -27,8 +27,12 @@ public class IndexTreeNode implements Comparable{
         return new IndexTreeNode(id,offset,length);
     }
 
+    public long getId(){
+        return id;
+    }
+
     public byte[] serialize(){
-        ByteBuffer buf = ByteBuffer.allocate(getNodeLength());
+        ByteBuffer buf = ByteBuffer.allocate(getNodeNumBytes());
         buf.putLong(id);
         buf.putLong(offset);
         buf.putInt(length);

@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import queue.Queue;
 import queue.QueueFactory;
-import queue.QueueStore;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,16 +13,14 @@ import java.util.Map;
 
 public class MMQCatalog {
     private static final Logger log = LogManager.getLogger(MMQCatalog.class);
-    private static final String FILE_NAME = "mmqcatalog.dat";
 
     private Map<String, Queue> catalog;
-    private final Path catalogDir;
     private final Path queuesDir;
 
-    public MMQCatalog(Path catalogDir, Path queuesPath) {
-        this.catalogDir = catalogDir.resolve(FILE_NAME);
+    public MMQCatalog(Path queuesPath) throws IOException {
         this.queuesDir = queuesPath;
-        loadCatalog();
+        this.catalog = new HashMap<>();
+        loadFromFile();
     }
 
     public void createQueue(String queueName) throws IOException {
@@ -31,12 +28,15 @@ public class MMQCatalog {
             log.info("Not creating Queue " + queueName + " as it already exists");
             return;
         }
+        createQueue(queueName, false);
+    }
+
+    private void createQueue(String queueName, boolean loadFromDisk) throws IOException {
         log.info("Creating queue " + queueName);
-        Queue queue = QueueFactory.newQueue(queuesDir, queueName);
+        Queue queue = QueueFactory.newQueue(queuesDir, queueName, loadFromDisk);
 
         catalog.put(queueName, queue);
         log.info("Created " + queueName + " in memory");
-        //saveCatalog();
     }
 
     public Queue getQueue(String queueName){
@@ -52,32 +52,11 @@ public class MMQCatalog {
         }
     }
 
-    private void saveCatalog() {
-        try {
-            log.info("Saving catalogDir");
-            OutputStream fos = Files.newOutputStream(catalogDir);;
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(catalog);
-            oos.close();
-            fos.close();
-            log.info("Saved catalogDir");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void loadCatalog() {
-        try {
-            InputStream fis = Files.newInputStream(catalogDir);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            catalog = (HashMap) ois.readObject();
-            ois.close();
-            fis.close();
-            log.info("Successfully loaded catalogDir " + catalog.toString());
-        }catch (IOException | ClassNotFoundException e) {
-            log.error("Failed to open catalogDir", e);
-            log.info("Creating empty catalogDir");
-            catalog = new HashMap<>();
+    private void loadFromFile() throws IOException {
+        log.info("Loading queues from Disk");
+        File[] directories = queuesDir.toFile().listFiles(File::isDirectory);
+        for (File directory : directories) {
+            createQueue(directory.toPath().getFileName().toString(), true);
         }
     }
 }

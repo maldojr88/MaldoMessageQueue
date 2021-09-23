@@ -19,9 +19,13 @@ public class QueueStore {
     private QueueStoreData data;
     private QueueStoreIndex index;
 
-    public QueueStore(Path dir) throws IOException {
+    public QueueStore(Path dir, boolean loadFromDisk) throws IOException {
         this.dir = dir;
-        Files.createDirectory(dir);
+        if(loadFromDisk) {
+            Files.createDirectories(dir);
+        }else{
+            Files.createDirectory(dir);
+        }
         this.data = new QueueStoreData(dir.resolve(DATA_FILENAME));
         this.index = new QueueStoreIndex(dir.resolve(INDEX_FILENAME));
     }

@@ -31,6 +31,10 @@ public class IndexTreeNode implements Comparable{
         return id;
     }
 
+    public long getOffset(){
+        return offset;
+    }
+
     public byte[] serialize(){
         ByteBuffer buf = ByteBuffer.allocate(getNodeNumBytes());
         buf.putLong(id);
@@ -44,4 +48,20 @@ public class IndexTreeNode implements Comparable{
         IndexTreeNode other = (IndexTreeNode) o;
         return (int) (id - other.id);
     }
+
+    //TODO - check equals invariants (reflexsive, symmentric etc)
+    @Override
+    public boolean equals(Object o){
+        IndexTreeNode other = (IndexTreeNode) o;
+        return this.id == other.id;
+    }
+
+    //TODO - check invariants
+    @Override
+    public final int hashCode() {
+        //int result = 17;
+        //return 31 * result * (int) id;
+        return (int) id;
+    }
+
 }

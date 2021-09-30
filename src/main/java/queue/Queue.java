@@ -8,17 +8,14 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Queue implements Serializable {
     private static final Logger log = LogManager.getLogger(Queue.class);
 
     private final String name;
     private Set<InetSocketAddress> publishers;
-    private Set<InetSocketAddress> consumers;
+    private Map<InetSocketAddress, Long> consumers;//remote adder, to instant id
     private final QueueStore queueStore;
     private List<QueueEntry> entries;
 
@@ -26,7 +23,7 @@ public class Queue implements Serializable {
         this.name = queueName;
         this.queueStore = queueStore;
         this.publishers = new HashSet<>();
-        this.consumers = new HashSet<>();
+        this.consumers = new HashMap<>();
         this.entries = new ArrayList<>();
     }
 
@@ -39,6 +36,7 @@ public class Queue implements Serializable {
         //byte[] packedEntry = entry.pack();
         //log.info(packedEntry);
         queueStore.append(entry);
+        //TODO - now notify all the consumers that need this message
     }
 
     private void validatePublish(InetSocketAddress address) {
@@ -55,7 +53,13 @@ public class Queue implements Serializable {
     }
 
     public void addConsumer(InetSocketAddress address){
-        consumers.add(address);
+        consumers.put(address, 0L);
+    }
+
+    public void addConsumer(InetSocketAddress address, long instant) throws IOException {
+        consumers.put(address, instant);
+        //TODO change to make the below more dynamic ==> currently just sending as we get
+        queueStore.getOffset(instant);
     }
 
     /*@Serial

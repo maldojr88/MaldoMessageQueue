@@ -37,6 +37,17 @@ public class MessageEncoder {
         return buffer;
     }
 
+    public static ByteBuf connectToConsume(String queueName, long instant){
+        ByteBuf buffer = Unpooled.copyInt(MessageType.CONNECT_TO_CONSUME.getType());
+        MessageType messageType = MessageType.CONNECT_TO_CONSUME;
+        log.info("Sending messageType to the Server " + messageType);
+        byte[] queueNameBytes = queueName.getBytes(StandardCharsets.UTF_8);
+        buffer.writeInt(queueName.length());
+        buffer.writeBytes(queueNameBytes);
+        buffer.writeLong(instant);
+        return buffer;
+    }
+
     private static void addChecksum(ByteBuf buf) {
         Checksum crc32 = new CRC32();
         byte[] bytes = new byte[buf.readableBytes()];

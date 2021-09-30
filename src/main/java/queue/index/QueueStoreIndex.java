@@ -7,14 +7,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.HashMap;
 
 public class QueueStoreIndex {
     private static final Logger log = LogManager.getLogger(QueueStoreIndex.class);
-    private static int dummyCounter = 0;
     private final Path path;
-    private TreeSet<IndexTreeNode> tree;
+    private HashMap<Long, IndexTreeNode> hash;//TODO - change to treeMap to ensure deterministic order
 
     public QueueStoreIndex(Path path) throws IOException {
         this.path = path;
@@ -26,18 +24,18 @@ public class QueueStoreIndex {
 
     private void setTree() throws IOException {
         if(Files.exists(path)){
-            this.tree = loadTreeFromFile();
+            this.hash = loadTreeFromFile();
         }else{
-            this.tree = new TreeSet<>();
+            this.hash = new HashMap<>();
         }
     }
 
-    private TreeSet<IndexTreeNode> loadTreeFromFile() throws IOException {
+    private HashMap<Long, IndexTreeNode> loadTreeFromFile() throws IOException {
         log.info("Loading Index from file");
-        TreeSet<IndexTreeNode> tree = new TreeSet<>();
+        HashMap<Long, IndexTreeNode> tree = new HashMap<>();
         int nodeSize = IndexTreeNode.getNodeNumBytes();
 
-        byte[] bytes = Files.readAllBytes(path);//change this to read larger files
+        byte[] bytes = Files.readAllBytes(path);//TODO change this to read larger files
         if(bytes.length % nodeSize != 0){
             throw new IOException("Corrupted index file - treeNodeSize= " + nodeSize + " bytes=" + bytes.length);
         }
@@ -45,34 +43,49 @@ public class QueueStoreIndex {
         for(int i=0; i < bytes.length; i += nodeSize){
             IndexTreeNode node = IndexTreeNode.from(bytes, i);
             log.info("Read - " + node.getId());
-            tree.add(node);
+            tree.put(node.getId(), node);
         }
 
         return tree;
     }
 
+    /**
+     * TODO
+     * Very suboptimal to write the entire tree on every append. Need to find an algorithm
+     * to efficiently and lazily append to a tree. This part can be scoped for future work
+     */
     public void append(IndexTreeNode treeNode) throws IOException {
-        tree.add(treeNode);
+        hash.put(treeNode.getId(), treeNode);
         write();
-        dummyCounter++;
-        if(dummyCounter == 4){
-            log.info("Recreating from file");
-            loadTreeFromFile();
-        }
     }
 
     public void write() throws IOException {
-        byte[] serializedTree = new byte[tree.size() * IndexTreeNode.getNodeNumBytes()];
+        byte[] serializedTree = new byte[hash.size() * IndexTreeNode.getNodeNumBytes()];
         int idx = 0;
-        Iterator<IndexTreeNode> it = tree.iterator();
+        for (IndexTreeNode next : hash.values()) {
+            log.info(next.getId());
+            byte[] serialize = next.serialize();
+            System.arraycopy(serialize, 0, serializedTree, idx, IndexTreeNode.getNodeNumBytes());
+            idx += IndexTreeNode.getNodeNumBytes();
+        }
+        /*Iterator<IndexTreeNode> it = hash.iterator();
         while (it.hasNext()){
             IndexTreeNode next = it.next();
             log.info(next.getId());
             byte[] serialize = next.serialize();
             System.arraycopy(serialize, 0, serializedTree, idx, IndexTreeNode.getNodeNumBytes());
             idx += IndexTreeNode.getNodeNumBytes();
-        }
+        }*/
         log.info("Writing index file of size " + serializedTree.length);
         Files.write(path, serializedTree, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    public long searchOffset(long instant) throws IOException {
+        if(!hash.containsKey(instant)){
+            throw new IOException("Instant " + instant + " not found in index file");
+        }
+        IndexTreeNode indexTreeNode = hash.get(instant);
+        log.info("Index file points to " + indexTreeNode.getOffset() + " offset in the data file");
+        return indexTreeNode.getOffset();
     }
 }

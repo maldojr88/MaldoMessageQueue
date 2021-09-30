@@ -31,8 +31,12 @@ public class QueueStore {
     }
 
     public void append(QueueEntry entry) throws IOException {
-        IndexTreeNode indexTreeNode = new IndexTreeNode(entry.getInstant(), data.getOffset(), entry.getByteSize());
+        long offset = data.getOffset();
         data.append(entry.pack());
-        index.append(indexTreeNode);
+        index.append(new IndexTreeNode(entry.getInstant(), offset, entry.getByteSize()));
+    }
+
+    public long getOffset(long instant) throws IOException {
+        return index.searchOffset(instant);
     }
 }

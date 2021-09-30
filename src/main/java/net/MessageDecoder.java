@@ -57,6 +57,28 @@ public class MessageDecoder extends ByteToMessageDecoder {
                     //validateChecksum(in);
                     out.add(msg);
                 }
+                case CONNECT_TO_CONSUME -> {
+                    if(in.readableBytes() < 4) {
+                        in.resetReaderIndex();
+                        return;
+                    }
+                    int strLen = in.readInt();
+                    if(in.readableBytes() < strLen){
+                        in.resetReaderIndex();
+                        return;
+                    }
+                    ByteBuf strBuff = in.readBytes(strLen);
+                    String queueName = strBuff.toString(CharsetUtil.UTF_8);
+                    if(in.readableBytes() < 8){
+                        in.resetReaderIndex();
+                        return;
+                    }
+                    long instant = in.readLong();
+                    Message msg = new MessageConnectToConsume(mmqServer,(InetSocketAddress) ctx.channel().remoteAddress(),
+                            queueName, instant);
+                    //validateChecksum(in);
+                    out.add(msg);
+                }
                 case PUBLISH -> {
                     if(in.readableBytes() < 4) {
                         in.resetReaderIndex();

@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
+import java.util.Scanner;
 
 public class MMQClient {
   private static final Logger log = LogManager.getLogger(MMQClient.class);
@@ -44,14 +45,22 @@ public class MMQClient {
       //f.channel().closeFuture().sync();//block until the channel closes
 
       //1st message
+
       channel.writeAndFlush(MessageEncoder.connectToPublish("Q1")).sync();
       Thread.sleep(3000);
 
       //2nd message
-      channel.writeAndFlush(MessageEncoder.publish("Q1", "Hello World!")).sync();
-      channel.writeAndFlush(MessageEncoder.publish("Q1", "Maldangel")).sync();
-      channel.writeAndFlush(MessageEncoder.publish("Q1", "El Mejoll")).sync();
-      channel.writeAndFlush(MessageEncoder.publish("Q1", "Lo ma duro")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "Storing MSG # 1")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "Storing MSG # 2")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "Storing MSG # 3")).sync();
+      channel.writeAndFlush(MessageEncoder.publish("Q1", "Storing MSG # 4")).sync();
+
+      Scanner keyboard = new Scanner(System.in);
+      System.out.println("Enter instant");
+      long instant = keyboard.nextLong();
+
+      //Consume
+      channel.writeAndFlush(MessageEncoder.connectToConsume("Q1", instant )).sync();
       //Thread.sleep(100000);
     } finally {
       //group.shutdownGracefully().sync();

@@ -81,11 +81,20 @@ public class QueueStoreIndex {
     }
 
     public long searchOffset(long instant) throws IOException {
-        if(!hash.containsKey(instant)){
-            throw new IOException("Instant " + instant + " not found in index file");
-        }
+        validate(instant);
         IndexTreeNode indexTreeNode = hash.get(instant);
         log.info("Index file points to " + indexTreeNode.getOffset() + " offset in the data file");
         return indexTreeNode.getOffset();
+    }
+
+    public IndexTreeNode getEntryFromInstant(long instant) throws IOException {
+        validate(instant);
+        return hash.get(instant);
+    }
+
+    private void validate(long instant) throws IOException {
+        if(!hash.containsKey(instant)){
+            throw new IOException("Instant " + instant + " not found in index file");
+        }
     }
 }

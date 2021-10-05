@@ -39,4 +39,12 @@ public class QueueStore {
     public long getOffset(long instant) throws IOException {
         return index.searchOffset(instant);
     }
+
+    //For debugging purposes
+    public void printMsgFromInstant(long instant) throws IOException {
+        IndexTreeNode indexEntry = index.getEntryFromInstant(instant);
+        QueueEntry entry = data.readFromOffset(indexEntry);
+        log.info("Read from file: ");
+        log.info(entry);
+    }
 }

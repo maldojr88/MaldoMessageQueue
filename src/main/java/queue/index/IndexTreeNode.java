@@ -5,12 +5,12 @@ import java.nio.ByteBuffer;
 public class IndexTreeNode implements Comparable{
     private long id;
     private long offset;
-    private int length;
+    private int numBytes;
 
     public IndexTreeNode(long id, long offset, int length){
         this.id = id;
         this.offset = offset;
-        this.length = length;
+        this.numBytes = length;
     }
 
     public static int getNodeNumBytes(){
@@ -35,11 +35,15 @@ public class IndexTreeNode implements Comparable{
         return offset;
     }
 
+    public int getNumBytes(){
+        return numBytes;
+    }
+
     public byte[] serialize(){
         ByteBuffer buf = ByteBuffer.allocate(getNodeNumBytes());
         buf.putLong(id);
         buf.putLong(offset);
-        buf.putInt(length);
+        buf.putInt(numBytes);
         return buf.array();
     }
 

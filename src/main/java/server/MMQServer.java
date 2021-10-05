@@ -49,9 +49,9 @@ public class MMQServer {
         queue.addPublisher(remoteAddress);
     }
 
-    public void registerConsumer(InetSocketAddress remoteAddress, String queueName, long instant) {
+    public void registerConsumer(InetSocketAddress remoteAddress, String queueName, long instant) throws IOException {
         Queue queue = catalog.getQueue(queueName);
-        queue.addConsumer(remoteAddress);
+        queue.addConsumer(remoteAddress, instant);
     }
 
     public void publish(InetSocketAddress address, String queueName, String msg) throws IOException {

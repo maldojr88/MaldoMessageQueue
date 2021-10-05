@@ -31,8 +31,8 @@ public class Queue implements Serializable {
         validatePublish(address);
         log.info("Publishing " + msg + " to this queue [" + name + "]");
         long id = Instant.now().toEpochMilli();
-        byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
-        QueueEntry entry = new QueueEntry(id, msgBytes);
+        //byte[] msgBytes = msg.getBytes(StandardCharsets.UTF_8);
+        QueueEntry entry = new QueueEntry(id, msg);
         //byte[] packedEntry = entry.pack();
         //log.info(packedEntry);
         queueStore.append(entry);
@@ -59,7 +59,8 @@ public class Queue implements Serializable {
     public void addConsumer(InetSocketAddress address, long instant) throws IOException {
         consumers.put(address, instant);
         //TODO change to make the below more dynamic ==> currently just sending as we get
-        queueStore.getOffset(instant);
+        //long offset = queueStore.getOffset(instant);
+        queueStore.printMsgFromInstant(instant);
     }
 
     /*@Serial

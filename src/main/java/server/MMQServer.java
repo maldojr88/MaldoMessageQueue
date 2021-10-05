@@ -8,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import net.MessageDecoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import queue.Queue;
@@ -26,10 +27,13 @@ public class MMQServer {
     private final MMQConfig config;
     private final MMQCatalog catalog;
 
-    public MMQServer(MMQConfig config) throws IOException {
+    public MMQServer(MMQConfig config) throws Exception {
         log.info("Loading MMQServer with the following config:\n" + config);
         this.config = config;
+        createWorkspace();
         this.catalog = new MMQCatalog(config.queuesDir());
+        bootstrapQueues();
+        acceptConnections();
     }
 
     public void createQueue(String queueName){
@@ -53,12 +57,6 @@ public class MMQServer {
     public void publish(InetSocketAddress address, String queueName, String msg) throws IOException {
         Queue queue = catalog.getQueue(queueName);
         queue.publish(address, msg);
-    }
-
-    public void initialize() throws Exception {
-        createWorkspace();
-        bootstrapQueues();
-        acceptConnections();
     }
 
     private void createWorkspace() throws IOException {

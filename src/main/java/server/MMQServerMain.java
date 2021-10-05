@@ -15,8 +15,7 @@ public class MMQServerMain {
   public static void main(String[] args) throws Exception {
     log.info("Initializing MMQServer");
     MMQConfig config = loadProperties();
-    MMQServer mmqServer = new MMQServer(config);
-    mmqServer.initialize();
+    new MMQServer(config);
   }
 
 

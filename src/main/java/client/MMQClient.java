@@ -49,6 +49,7 @@ public class MMQClient {
       channel.writeAndFlush(MessageEncoder.connectToPublish("Q1")).sync();
       Thread.sleep(3000);
 
+      System.out.println("MMG TOO");
       //2nd message
       channel.writeAndFlush(MessageEncoder.publish("Q1", "Storing MSG # 1")).sync();
       channel.writeAndFlush(MessageEncoder.publish("Q1", "Storing MSG # 2")).sync();

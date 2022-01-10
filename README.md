@@ -1,6 +1,8 @@
 MaldoMessageQueue (MMQ)
 =====
 
+UPDATE! - this project was put on HOLD due to career changes.
+
 Overview
 --------
 For learning purposes, create a simple, distributed message queue modelled after Apache Kafka.
